@@ -1,0 +1,24 @@
+volumes:
+  database_var:
+
+services:
+  frankenphp:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    entrypoint: php artisan octane:frankenphp --workers=1 --max-requests=1
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+
+  database:
+    image: postgres:18
+    environment:
+      - POSTGRES_DB=leavedb
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - database_var:/var/lib/postgresql18/data
