@@ -1,5 +1,6 @@
 volumes:
   database_var:
+  n8n_data:
 
 services:
   frankenphp:
@@ -22,3 +23,11 @@ services:
       - "5432:5432"
     volumes:
       - database_var:/var/lib/postgresql18/data
+
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - target: 5678
+        published: 5678
+    volumes:
+      - n8n_data:/home/node/.n8n
