@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Leave;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
-class ViewLeaveController
+readonly class ViewLeaveController
 {
     public function __invoke(): View
     {

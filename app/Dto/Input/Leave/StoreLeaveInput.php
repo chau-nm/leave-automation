@@ -2,7 +2,6 @@
 
 namespace App\Dto\Input\Leave;
 
-use App\Http\Requests\StoreLeaveRequest;
 use App\Models\Leave;
 use App\Models\User;
 

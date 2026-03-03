@@ -4,15 +4,15 @@ namespace App\Http\Controllers\Leave;
 
 use App\Dto\Input\Leave\StoreLeaveInput;
 use App\Http\Requests\StoreLeaveRequest;
-use App\Service\Leave\StoreLeaveService;
+use App\Service\Leave\LeaveService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
-class CreateLeaveController
+readonly class CreateLeaveController
 {
     public function __construct(
-        private StoreLeaveService $storeLeaveService
+        private LeaveService $leaveService
     )
     {
     }
@@ -24,7 +24,7 @@ class CreateLeaveController
 
     public function store(StoreLeaveRequest $request): RedirectResponse|View
     {
-        $saved = $this->storeLeaveService->store(
+        $saved = $this->leaveService->store(
             StoreLeaveInput::fromRequest($request->user(), $request->validated())
         );
 
