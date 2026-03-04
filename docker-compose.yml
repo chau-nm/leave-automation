@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-    entrypoint: php artisan octane:frankenphp --workers=1 --max-requests=1
+    entrypoint: php artisan octane:frankenphp --watch
     ports:
       - "8000:8000"
     volumes:
@@ -29,5 +29,9 @@ services:
     ports:
       - target: 5678
         published: 5678
+    environment:
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - BACKEND_HOST=frankenphp
+      - BACKEND_PORT=8000
     volumes:
       - n8n_data:/home/node/.n8n

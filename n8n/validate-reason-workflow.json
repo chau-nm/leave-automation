@@ -1,0 +1,183 @@
+{
+  "name": "validate-reason",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User send leave with id {{ $json.body.leave_id }} and reason is that {{ $json.body.reason }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a leave manager.\n\nYour task is to evaluate whether a leave request is valid based on its reason.\n\nValid reasons include:\n- Sick leave\n- Family emergency\n- Marriage\n- Bereavement\n- Personal urgent matters\n\nInvalid reasons include:\n- No reason\n- Vague reasons\n- Leisure without prior approval\n\nOutput requirements:\n- Return ONLY a JSON object\n- Do NOT include any extra text\n- The JSON must follow this exact format:\n\n{\n  \"leave_id\": \"leave id receive from request\",\n  \"status\": \"valid\" | \"invalid\",\n  \"reason\": \"short explanation\"\n}\n\nReturn ONLY raw JSON.\nDo NOT wrap the response in markdown.\nDo NOT include ``` or the word \"json\".\nOutput must start with { and end with }."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -192,
+        -112
+      ],
+      "id": "aec8b4cb-21db-4d06-b2ac-4ef9ac2dbf5e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        128
+      ],
+      "id": "efd56c4f-ca96-46ae-be55-07f41fcc2ed2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qaQWsPJf76tgGwwH",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leave/validate",
+        "authentication": "basicAuth",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {
+          "allowedOrigins": "*",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -512,
+        -112
+      ],
+      "id": "115a5041-8de8-4d30-ba00-4f238acc3c38",
+      "name": "Webhook",
+      "webhookId": "388f30be-115b-45f2-a53e-143c39b7499f",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "v9MbWs4VFCdxdt6m",
+          "name": "Webhook Basic Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"leave_id\": 1,\n  \"status\": \"valid\",\n  \"reason\": \"short explanation\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        128
+      ],
+      "id": "19ef6665-207d-41f9-9638-ad9067f9a317",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ 'http://' + $env.BACKEND_HOST +':' + $env.BACKEND_PORT +'/api/leave/' + $json.output.leave_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"{{ $json.output.status === \"valid\" ? \"accepted\" : \"rejected\" }}\",\n  \"status_reason\": \"{{ $json.output.reason }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        -112
+      ],
+      "id": "5c2a5cc7-071d-4db0-848e-a7d425d499b5",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2cca4b1d-19ed-4166-bf56-1372ec86c841",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2f4d0c902254eb0a76811b45824a48fddad26484b436aaf64070e707c201c88b"
+  },
+  "id": "RRjovKNDylpfcm0j",
+  "tags": []
+}
