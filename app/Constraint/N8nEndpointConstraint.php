@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Constaint;
+namespace App\Constraint;
 
 class N8nEndpointConstraint
 {

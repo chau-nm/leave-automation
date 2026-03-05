@@ -3,7 +3,7 @@
 namespace App\Service\N8n;
 
 use App\Client\N8nClient;
-use App\Constaint\N8nEndpointConstraint;
+use App\Constraint\N8nEndpointConstraint;
 use App\Dto\Input\Leave\ValidateLeaveReasonInput;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Promises\LazyPromise;
