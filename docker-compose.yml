@@ -56,5 +56,13 @@ services:
       dockerfile: ./docker/Dockerfile
     entrypoint: php artisan rabbitmq:consume
     depends_on:
-      - database
+      - frankenphp
       - rabbitmq
+
+  job_work:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    entrypoint: php artisan queue:work -v
+    depends_on:
+      - database

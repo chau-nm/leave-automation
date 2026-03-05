@@ -4,10 +4,9 @@ namespace App\Service\Leave;
 
 use App\Dto\Input\Leave\StoreLeaveInput;
 use App\Dto\Input\Leave\UpdateLeaveInput;
-use App\Dto\Input\Leave\ValidateLeaveReasonInput;
 use App\Enums\Leave\LeaveStatusEnum;
+use App\Jobs\ProcessLeaveReason;
 use App\Models\Leave;
-use App\Service\N8n\N8nService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -15,7 +14,6 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 readonly class LeaveService
 {
     public function __construct(
-        private N8nService $n8nService,
     )
     {
     }
@@ -32,10 +30,10 @@ readonly class LeaveService
             return $leave;
         });
 
-        $this->n8nService->validateLeaveReasonWebhookTrigger(new ValidateLeaveReasonInput(
+        ProcessLeaveReason::dispatch(
             $leave->id,
-            $leave->leave_reason
-        ));
+            $leave->leave_reason,
+        );
 
         return $leave;
     }

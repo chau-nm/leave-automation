@@ -5,7 +5,7 @@ namespace App\Dto\Input\Leave;
 class ValidateLeaveReasonInput
 {
     public function __construct(
-        public string $leaveId,
+        public int $leaveId,
         public string $reason
     )
     {
