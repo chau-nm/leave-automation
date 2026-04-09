@@ -7,9 +7,11 @@ COPY --from=node /usr/local /usr/local
 WORKDIR /app
 
 RUN install-php-extensions \
+    @composer \
     pcntl \
     pdo_pgsql \
-    pgsql
+    pgsql \
+    sockets
 
 COPY . /app
 RUN chmod +x /app/docker/start-dev.sh

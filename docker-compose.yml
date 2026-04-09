@@ -1,7 +1,6 @@
 volumes:
   database_var:
   n8n_data:
-  rabbitmq_var:
 
 services:
   frankenphp:
@@ -40,30 +39,11 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
 
-  rabbitmq:
-    image: rabbitmq:4.2.4-management
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=admin
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    volumes:
-      - rabbitmq_var:/var/lib/rabbitmq
-
-  rabbit_consumer:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-    entrypoint: php artisan rabbitmq:consume
-    depends_on:
-      - frankenphp
-      - rabbitmq
-
   job_work:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
+    restart: on-failure
     entrypoint: php artisan queue:work -v
     depends_on:
       - database
